@@ -1,16 +1,14 @@
-import { Menu, Button, Text, rem, NativeSelect, Slider } from '@mantine/core';
-import { useState } from 'react';
-import {
-  IconSettings,
-  IconSearch,
-  IconPhoto,
-  IconMessageCircle,
-  IconTrash,
-  IconArrowsLeftRight,
-} from '@tabler/icons-react';
+import { Menu, Button, NativeSelect, Slider } from '@mantine/core';
+// import {
+//   IconSettings,
+//   IconSearch,
+//   IconPhoto,
+//   IconMessageCircle,
+//   IconTrash,
+//   IconArrowsLeftRight,
+// } from '@tabler/icons-react';
 
 export function OptionsMenu(props : any) {
-  const [value, setValue] = useState("");
 
   return (
     <Menu shadow="md" closeOnItemClick={false}>

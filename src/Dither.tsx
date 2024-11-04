@@ -1,5 +1,5 @@
 
-import { Center, Flex, Group, Space } from "@mantine/core";
+import { Space } from "@mantine/core";
 import { HeaderSimple } from "./components/Header";
 import { ImageZone } from "./components/ImageZone";
 import { useState } from "react";

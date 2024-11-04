@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FileButton, Button, Group, Text, Image, NavLink, Checkbox, Grid, Stack, Center, Flex} from '@mantine/core';
+import { FileButton, Button, Image, Checkbox, Grid, Flex} from '@mantine/core';
 import { useRef, useEffect } from 'react';
 import { BlackAndWhite } from '../algorithms/BlackAndWhite';
 import { Threshold } from '../algorithms/Threshold';
@@ -14,8 +14,8 @@ export function ImageControls(props : any) {
   const [file, setFile] = useState<File | null>(null);
   const [checked, setChecked] = useState(true);
   const [image_download, setDownload] = useState("");
-  const [canvas_width, setWidth] = useState(800);
-  const [canvas_height, setHeight] = useState(800);
+  // const [canvas_width, setWidth] = useState(800);
+  // const [canvas_height, setHeight] = useState(800);
 
   const myCanvas = useRef<HTMLCanvasElement>(null);
   const canvas = document.getElementById("to-dither");
