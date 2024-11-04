@@ -1,5 +1,5 @@
-# Mantine Vite template
+# Dithering
 
-Get started with the template by clicking `Use this template` button on the top of the page.
+An application that allows for the dithering of images with 5 different algorithm options.
 
-[Documentation](https://mantine.dev/guides/vite/)
+[Documentation](---)
