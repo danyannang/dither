@@ -1,10 +1,6 @@
 
 import { Center, Flex, Group, Space } from "@mantine/core";
 import { HeaderSimple } from "./components/Header";
-import { OptionsMenu } from "./components/OptionsMenu";
-import { Shell } from "./components/Shell";
-import { Image } from "@mantine/core";
-import { FileUploadButton } from "./components/ImageControls";
 import { ImageZone } from "./components/ImageZone";
 import { useState } from "react";
 
