@@ -1,13 +1,13 @@
 import { Image, Stack } from "@mantine/core";
-import { FileUploadButton } from "./ImageControls";
+import { ImageControls } from "./ImageControls";
 import { useState } from "react";
 
-export function ImageZone() {
+export function ImageZone(props : any) {
   const [image, setImage] = useState();
 
   return (
-    <Stack>
-        <FileUploadButton></FileUploadButton>
-    </Stack>
+    <>
+        <ImageControls dither={props.dither} options={props.options} onChange={props.onChange} setOptions={props.setOptions}></ImageControls>
+    </>
   );
 }
