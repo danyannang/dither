@@ -1,4 +1,4 @@
-
+// as the name implies, randomly assign each pixel black or white
 export function Random(imageData : ImageData, options: any) {
   const data = imageData.data;
 

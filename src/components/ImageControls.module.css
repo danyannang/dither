@@ -2,6 +2,13 @@
   height: 100%;
 }
 
+.canvas_hidden {
+  display: none;
+}
+
+/**
+  responsive sizing for the visible original image and canvas
+**/
 .uploadedImage {
   max-width: 800px;
   max-height: 800px;
@@ -14,6 +21,7 @@
 @media (max-width: 120em) {
   .uploadedImage {
     max-width: 700px;
+    max-height: 700px;
   }
   .canvas {
     max-width: 700px;
@@ -24,6 +32,7 @@
 @media (max-width: 75em) {
   .uploadedImage {
     max-width: 600px;
+    max-height: 600px;
   }
   .canvas {
     max-width: 600px;
@@ -34,6 +43,7 @@
 @media (max-width: 48em) {
   .uploadedImage {
     max-width: 500px;
+    max-height: 500px;
   }
   .canvas {
     max-width: 500px;
@@ -44,9 +54,32 @@
 @media (max-width: 36em) {
   .uploadedImage {
     max-width: 450px;
+    max-height: 450px;
   }
   .canvas {
     max-width: 450px;
     max-height: 450px;
+  }
+}
+
+@media (max-width: 30em) {
+  .uploadedImage {
+    max-width: 350px;
+    max-height: 350px;
+  }
+  .canvas {
+    max-width: 350px;
+    max-height: 350px;
+  }
+}
+
+@media (max-width: 24em) {
+  .uploadedImage {
+    max-width: 250px;
+    max-height: 250px;
+  }
+  .canvas {
+    max-width: 250px;
+    max-height: 250px;
   }
 }

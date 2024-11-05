@@ -1,8 +1,8 @@
 
 import { Space } from "@mantine/core";
 import { HeaderSimple } from "./components/Header";
-import { ImageZone } from "./components/ImageZone";
 import { useState } from "react";
+import { ImageControls } from "./components/ImageControls";
 
 export default function Dither() {
   const [dither, setDither] = useState("");
@@ -18,8 +18,7 @@ export default function Dither() {
     <div>
       <HeaderSimple></HeaderSimple>
       <Space h="lg"></Space>
-        {/* <OptionsMenu dither={dither} onChange={setDither} options={options} setOptions={setOptions}></OptionsMenu> */}
-      <ImageZone dither={dither} options={options} onChange={setDither} setOptions={setOptions}></ImageZone>
+      <ImageControls dither={dither} options={options} onChange={setDither} setOptions={setOptions}></ImageControls>
       <Space h="lg"></Space>
     </div>
   );

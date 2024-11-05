@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { FileButton, Button, Image, Checkbox, Grid, Flex} from '@mantine/core';
 import { useRef, useEffect } from 'react';
-import { BlackAndWhite } from '../algorithms/BlackAndWhite';
 import { Threshold } from '../algorithms/Threshold';
 import { Random } from '../algorithms/Random';
 import { Ordered } from '../algorithms/Ordered';
@@ -9,16 +8,25 @@ import { FloydSteinberg } from '../algorithms/FloydSteinberg';
 import { Atkinson } from '../algorithms/Atkinson';
 import { OptionsMenu } from './OptionsMenu';
 import classes from "./ImageControls.module.css";
+import { IconDownload, IconUpload } from '@tabler/icons-react';
 
 export function ImageControls(props : any) {
+  // keeps track of uploaded image 
   const [file, setFile] = useState<File | null>(null);
+  // whether original image should be shown
   const [checked, setChecked] = useState(true);
+  // dithered image file, target for download
   const [image_download, setDownload] = useState("");
-  // const [canvas_width, setWidth] = useState(800);
-  // const [canvas_height, setHeight] = useState(800);
+  // hidden canvas width and height, changes on image upload
+  const [iWidth, setWidth] = useState(0);
+  const [iHeight, setHeight] = useState(0);
 
+  // canvasTwo is the hidden canvas of original image size
   const myCanvas = useRef<HTMLCanvasElement>(null);
   const canvas = document.getElementById("to-dither");
+  const myCanvasTwo = useRef<HTMLCanvasElement>(null);
+  const canvasTwo = document.getElementById("to-hide");
+
   let cwidth : number | undefined;
   let cheight : number | undefined;
 
@@ -32,93 +40,97 @@ export function ImageControls(props : any) {
   }
 
   let context : CanvasRenderingContext2D | null;
+  let contextTwo : CanvasRenderingContext2D | null;
+
   let image = document.createElement("img");
 
   let width = image.naturalWidth;
   let height = image.naturalHeight;
   let hRatio = cwidth! / width;
   let vRatio = cheight! / height;
-  // let hRatio = canvas_width! / width;
-  // let vRatio = canvas_height! / height;
   let ratio  = Math.min ( hRatio, vRatio );
   let shift_x = ( cwidth! - width*ratio ) / 2;
   let shift_y = ( cheight! - height*ratio ) / 2;  
 
+  // whenever tracked states change, rerender the dithered image according to chosen algorithm and options
   useEffect(() => {
     context = myCanvas?.current!.getContext("2d", { willReadFrequently: true });
+    contextTwo = myCanvasTwo?.current!.getContext("2d", { willReadFrequently: true });
+
     image.src = file ? URL.createObjectURL(file) : "";
 
     image.onload = () => {
       width = image.naturalWidth;
       height = image.naturalHeight;
+      setWidth(image.naturalWidth);
+      setHeight(image.naturalHeight);
       hRatio = cwidth! / width;
       vRatio = cheight! / height;
-      // hRatio = canvas_width! / width;
-      // vRatio = canvas_height! / height;
+
+      // center the dithered image in the canvas using the shifts
       ratio  = Math.min ( hRatio, vRatio );
       shift_x = ( cwidth! - width*ratio ) / 2;
       shift_y = ( cheight! - height*ratio ) / 2;  
-      context!.clearRect(0, 0, cwidth!, cheight!);
-      // height *= ratio;
-      // width *= ratio;
-      // console.log(width * ratio, height * ratio);
-      // setWidth(width*2);
-      // setHeight(height*2);
-      context!.drawImage(image, 0, 0, width, height, shift_x, shift_y, width *= ratio, height *= ratio);
-      // context!.drawImage(image, 0, 0, width*ratio, height*ratio);
-      // context!.drawImage(image, 0, 0, canvas_width, canvas_height);
 
-      // context!.drawImage(image, 0, 0);
+      context!.clearRect(0, 0, cwidth!, cheight!);
+      contextTwo!.clearRect(0, 0, width, height);
+
+      context!.drawImage(image, 0, 0, width, height, shift_x, shift_y, width *= ratio, height *= ratio);
+      contextTwo!.drawImage(image, 0, 0, iWidth, iHeight);
 
       let imageData = context!.getImageData(0, 0, cwidth!, cheight!);
-      // let imageData = context!.getImageData(0, 0, canvas_width!, canvas_height!);
+      let imageDataTwo = contextTwo!.getImageData(0, 0, iWidth, iHeight);
 
       // depending on which dither option is selected, run the proper algorithm on the imageData
       {['None','Threshold', 'Random', 'Ordered (Bayer)', 'Floyd-Steinberg', 'Jarvis-Judice-Ninke']}
       switch (props.dither) {
+        // return to original non-dithered image
         case 'None':
-          console.log('black and white!');
-          imageData = BlackAndWhite(imageData);
           break;
         case 'Threshold':
-          console.log('threshold!');
           imageData = Threshold(imageData, props.options);
+          imageDataTwo = Threshold(imageDataTwo, props.options);
           break;
         case 'Random':
-          console.log('random!', props.options.random_max);
           imageData = Random(imageData, props.options);
+          imageDataTwo = Random(imageDataTwo, props.options);
           break;
         case 'Ordered (Bayer)':
-          console.log('ordered!', props.options.bayer_level);
           imageData = Ordered(imageData, props.options);
+          imageDataTwo = Ordered(imageDataTwo, props.options);
           break;
         case 'Floyd-Steinberg':
-          console.log('floyd steinberg!');
           imageData = FloydSteinberg(imageData, props.options);
+          imageDataTwo = FloydSteinberg(imageDataTwo, props.options);
           break;
         case 'Atkinson':
-          console.log('stucki!');
           imageData = Atkinson(imageData, props.options);
+          imageDataTwo = Atkinson(imageDataTwo, props.options);
           break;
         default:
           console.log('switch to', props.dither);
           break;
       }
 
-      //put pixel data on canvas.
+      // clear the other pixels on the canvas first 
       context!.clearRect(0, 0, cwidth!, cheight!);
-      // context!.clearRect(0, 0, canvas_width!, canvas_height!);
+      contextTwo!.clearRect(0, 0, iWidth, iHeight);
+      // put the new image data onto respective canvasses
       context!.putImageData(imageData, 0, 0);
-
-      setDownload((canvas as HTMLCanvasElement).toDataURL());
+      contextTwo!.putImageData(imageDataTwo, 0, 0);
+      // change the download to the new dithered image
+      setDownload((canvasTwo as HTMLCanvasElement).toDataURL());
     }
   }, [file, props.dither, props.options]);
 
+  // render the grid with the image area and options selection
+  // second invisible canvas just for downloading the dithered image in original image size
+  // also includes a checkbox that shows the original uploaded image for comparison with the dithered if checked
   return (
     <>
       <Grid>
-        <Grid.Col span={{ base: 12,  lg: 1 }}></Grid.Col>
-        <Grid.Col span={{ base: 12,  lg: 8 }}>
+        <Grid.Col span={{ base: 12, sm: 1}}/>
+        <Grid.Col span={{ base: 12,  md: checked ? 8 : 6, lg: 7, xl: checked ? 9 : 6}}>
           <Flex
             gap="md"
             justify="center"
@@ -133,9 +145,10 @@ export function ImageControls(props : any) {
               height="auto"
             /> : <></>}
             <canvas className={classes.canvas} id="to-dither" ref={myCanvas} width={800} height={800}/>
+            <canvas className={classes.canvas_hidden} id="to-hide" ref={myCanvasTwo} width={iWidth} height={iHeight}/>
           </Flex>
         </Grid.Col>
-        <Grid.Col span={{ base: 12, lg: 3 }}>
+        <Grid.Col span={{ base: 12, md: checked ? 3 : 5, lg: 5, xl: checked ? 2 : 5}}>
           <Flex
             className={classes.menu}
             gap="md"
@@ -146,16 +159,13 @@ export function ImageControls(props : any) {
           >
             <FileButton onChange={setFile} accept="image/png,image/jpeg">
               {(props) => <Button color="grey" {...props}>
-                <svg  xmlns="http://www.w3.org/2000/svg"  width="18"  height="18"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  strokeWidth="2"  strokeLinecap="round"  strokeLinejoin="round"  className="icon icon-tabler icons-tabler-outline icon-tabler-upload"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 9l5 -5l5 5" /><path d="M12 4l0 12" /></svg>
+                <IconUpload width="18"  height="18"  viewBox="0 0 24 24"></IconUpload>
                 &nbsp;Upload Image
               </Button>}
             </FileButton>
-            {/* <a href={file ? URL.createObjectURL(file) : ''} download={file ? file.name : null}>
-              <Button variant="filled">Download Dithered Image</Button>
-            </a> */}
             <a href={image_download} download={file ? file.name : null}>
               <Button variant="filled" color="grey">
-                <svg  xmlns="http://www.w3.org/2000/svg"  width="18"  height="18"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  strokeWidth="2"  strokeLinecap="round"  strokeLinejoin="round"  className="icon icon-tabler icons-tabler-outline icon-tabler-download"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg>
+                <IconDownload width="18"  height="18"  viewBox="0 0 24 24"></IconDownload>
                 &nbsp;Download Dithered Image
               </Button>
             </a>
@@ -166,17 +176,10 @@ export function ImageControls(props : any) {
               onChange={(event) => setChecked(event.currentTarget.checked)}
               label="Show Original"
             />
-            <OptionsMenu dither={props.dither} onChange={props.onChange} options={props.options} setOptions={props.setOptions}></OptionsMenu>
+            <OptionsMenu dither={props.dither} setDither={props.onChange} options={props.options} setOptions={props.setOptions}></OptionsMenu>
           </Flex>
         </Grid.Col>
       </Grid>
-
-      {/* <Group justify="center">
-        
-      </Group> */}
-      {/* <Group justify="center">
-        
-      </Group> */}
     </>
   );
 }

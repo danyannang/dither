@@ -1,7 +1,7 @@
 import { colorPalette } from "./PaletteColors"
 
-// Implementing Floyd-Steinberg dithering in JavaScript involves iterating over the pixels of an image, quantizing each pixel to a limited color palette, and then distributing the quantization error to neighboring pixels. Here's a basic implementation:
-
+// involves iterating over the pixels of an image, quantizing each pixel to a limited color palette, and then distributing the quantization error to neighboring pixels
+// distributes closer than Floyd-Steinberg but more of the error
 export function FloydSteinberg(imageData : ImageData, options : any) {
   const width = imageData.width;
   const height = imageData.height;
@@ -49,6 +49,7 @@ function findClosestPaletteColor(r : number, g : number, b : number, palette : A
     let new_g = palette[i][1];
     let new_b = palette[i][2];
 
+    // use Euclidean function to find closest color using the rgb values as the 3 points
     let distance = Math.sqrt((new_r - r) ** 2 +(new_g - g) ** 2 +(new_b - b) ** 2);
     if (distance < min_distance) {
       min_distance = distance;
@@ -59,6 +60,7 @@ function findClosestPaletteColor(r : number, g : number, b : number, palette : A
   return closest;
 }
 
+// add the error values to each corresponding index
 function distributeError(data : Uint8ClampedArray, x : number, y : number, err_r : number,  err_g : number, err_b : number, width : number) {
   const index = (y * width + x) * 4;
   data[index] += err_r;

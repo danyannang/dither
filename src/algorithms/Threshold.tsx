@@ -5,13 +5,6 @@ export function Threshold(imageData : ImageData, options: any) {
 
   const data = imageData.data;
 
-  // Calculate the average grayscale value (threshold) 0-255
-  // let sum = 0;
-  // for (let i = 0; i < data.length; i += 4) {
-  //   sum += data[i]; // Red component
-  // }
-  // const average = sum / (width * height);
-
   let average = options.threshold;
 
   console.log('threshold is ', average);
